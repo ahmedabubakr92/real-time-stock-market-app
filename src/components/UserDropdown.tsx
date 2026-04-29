@@ -44,7 +44,7 @@ export default function UserDropdown() {
           </div>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-auto text-gray-400">
+      <DropdownMenuContent className="text-gray-400">
         <DropdownMenuLabel>
           <div className="flex items-center gap-3">
             <Avatar className="h-10 w-10 ">
