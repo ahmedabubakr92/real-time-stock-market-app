@@ -21,9 +21,15 @@ export default function useTradingViewWidget(
     script.src = scriptUrl;
     script.async = true;
     script.innerHTML = JSON.stringify(config);
+
+    script.onload = () => {
+      if (containerRef.current) containerRef.current.dataset.loaded = "true";
+    };
+    script.onerror = () => {
+      if (containerRef.current) delete containerRef.current.dataset.loaded;
+    };
+
     containerRef.current.appendChild(script);
-    
-    containerRef.current.dataset.loaded = "true";
 
     return () => {
       if (containerRef.current) {
