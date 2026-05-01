@@ -4,7 +4,11 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import InputField from "@/components/forms/InputField";
 import SelectField from "@/components/forms/SelectField";
-import { INVESTMENT_GOALS, RISK_TOLERANCE_OPTIONS, PREFERRED_INDUSTRIES } from "@/lib/constants";
+import {
+  INVESTMENT_GOALS,
+  RISK_TOLERANCE_OPTIONS,
+  PREFERRED_INDUSTRIES,
+} from "@/lib/constants";
 import CountrySelectField from "@/components/forms/CountrySelectField";
 import FooterLink from "@/components/forms/FooterLink";
 
@@ -47,7 +51,13 @@ export default function SignUp() {
           placeholder="John Doe"
           register={register}
           error={errors.fullName}
-          validation={{ required: "Full name is required", minLength: 2 }}
+          validation={{
+            required: "Full name is required",
+            minLength: {
+              value: 2,
+              message: "Full name must be at least 2 characters",
+            },
+          }}
         />
 
         <InputField
@@ -79,11 +89,10 @@ export default function SignUp() {
               value: 8,
               message: "Password must be at least 8 characters",
             },
-            
           }}
         />
 
-        <CountrySelectField 
+        <CountrySelectField
           name="country"
           label="Country"
           control={control}
@@ -130,11 +139,11 @@ export default function SignUp() {
         </Button>
       </form>
 
-      <FooterLink 
-          text="Already have an account?"
-          linkText="Sign in"
-          href="/sign-in"
-        />
+      <FooterLink
+        text="Already have an account?"
+        linkText="Sign in"
+        href="/sign-in"
+      />
     </>
   );
 }
