@@ -23,11 +23,18 @@ function InputField({
         id={name}
         placeholder={placeholder}
         disabled={disabled}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${name}-error` : undefined}
         value={value}
         className={cn("form-input", {"opacity-50 cursor-not-allowed": disabled})}
         {...register(name, validation)}
       />
-      {error && <p className="text-sm text-red-500">{error.message}</p> }
+      
+      {error && (
+        <p id={`${name}-error`} className="text-sm text-red-500">
+            {error.message}
+        </p>
+      )}
     </div>
   );
 }

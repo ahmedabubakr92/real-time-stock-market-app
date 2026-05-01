@@ -31,7 +31,12 @@ function SelectField({
         }}
         render={({ field }) => (
           <Select value={field.value} onValueChange={field.onChange}>
-            <SelectTrigger className="select-trigger">
+            <SelectTrigger 
+              id={name}
+              aria-invalid={!!error}
+              aria-describedby={error ? `${name}-error` : undefined}
+              className="select-trigger"
+            >
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent className="bg-gray-800 border-gray-600 text-white">
@@ -47,7 +52,12 @@ function SelectField({
                 ))}
               </SelectGroup>
             </SelectContent>
-            {error && <p className="text-sm text-red-500">{error.message}</p>}
+            
+            {error && (
+                <p id={`${name}-error`} className="text-sm text-red-500">
+                    {error.message}
+                </p>
+            )}
           </Select>
         )}
       />

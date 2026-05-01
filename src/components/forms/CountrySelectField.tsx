@@ -65,9 +65,12 @@ export default function CountrySelectField({
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
+                id={name}
                 variant="outline"
                 role="combobox"
                 aria-expanded={open}
+                aria-invalid={!!error}
+                aria-describedby={error ? `${name}-error` : undefined}
                 className="country-select-trigger"
               >
                 {field.value ? (
@@ -130,7 +133,11 @@ export default function CountrySelectField({
         )}
       />
 
-      {error && <p className="text-sm text-red-500">{error.message}</p>}
+      {error && (
+        <p id={`${name}-error`} className="text-sm text-red-500">
+            {error.message}
+        </p>
+      )}
       <p className="text-xs text-gray-500">
         Helps us show market data and news relevant to you.
       </p>

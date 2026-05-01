@@ -9,7 +9,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         <Link href="/" className="auth-logo">
           <Image
             src="/assets/icons/logo.svg"
-            alt=""
+            alt="Signalist logo"
             width={140}
             height={32}
             className="h-8 w-auto"
@@ -34,7 +34,8 @@ export default function Layout({ children }: { children: ReactNode }) {
               {[1, 2, 3, 4, 5].map((star) => (
                 <Image
                   src="/assets/icons/star.svg"
-                  alt="Star"
+                  alt=""
+                  aria-hidden="true"
                   key={star}
                   width={20}
                   height={20}

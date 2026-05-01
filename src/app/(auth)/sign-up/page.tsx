@@ -131,7 +131,7 @@ export default function SignUp() {
       </form>
 
       <FooterLink 
-          text="Already have an account ?"
+          text="Already have an account?"
           linkText="Sign in"
           href="/sign-in"
         />

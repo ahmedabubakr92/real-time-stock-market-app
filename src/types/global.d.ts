@@ -1,4 +1,4 @@
-import { FieldError, RegisterOptions, UseFormRegister } from "react-hook-form";
+import { Control, FieldError, RegisterOptions, UseFormRegister } from "react-hook-form";
 
 declare global {
   type SignInFormData = {
