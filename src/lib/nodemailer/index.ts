@@ -11,7 +11,7 @@ export const transporter = nodemailer.createTransport({
 
 export async function sendWelcomeEmail({ email, name, intro }: WelcomeEmailData) {
     const htmlTemplate = WELCOME_EMAIL_TEMPLATE
-        .replace('{{name}}', name).replace("{{intro}}", intro);
+        .replaceAll('{{name}}', name).replaceAll('{{intro}}', intro);
 
     const mailOptions = {
         from: `"Signalist" <${process.env.NODEMAILER_EMAIL}>`,

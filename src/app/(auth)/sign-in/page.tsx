@@ -23,15 +23,12 @@ export default function SignIn() {
   });
 
   async function onSubmit(data: SignInFormData) {
-    try {
-      const result = await signInWithEmail(data);
-      if (result.success) {
-        router.push("/");
-      }
-    } catch (e) {
-      console.error("Sign in failed");
+    const result = await signInWithEmail(data);
+    if (result.success) {
+      router.push("/");
+    } else {
       toast.error("Sign in failed", {
-        description: e instanceof Error ? e.message : "Failed to sign in",
+        description: result.error ?? "Failed to sign in",
       });
     }
   }

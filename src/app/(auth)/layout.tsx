@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/better-auth/auth";
 
 export default async function Layout({ children }: { children: ReactNode }) {
-  const session = await auth.api.getSesstion({
+  const session = await auth.api.getSession({
     headers: await headers()
   })
 
