@@ -3,7 +3,7 @@ import Image from "next/image";
 import NavItems from "./NavItems";
 import UserDropdown from "./UserDropdown";
 
-function Header() {
+function Header({user}: {user: User}) {
   return (
     <header className="sticky top-0 header ">
       <div className="container header-wrapper">
@@ -19,7 +19,7 @@ function Header() {
         <nav className="hidden sm:block">
           <NavItems />
         </nav>
-        <UserDropdown />
+        <UserDropdown user={user} />
       </div>
     </header>
   );

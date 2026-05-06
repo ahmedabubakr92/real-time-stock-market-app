@@ -4,8 +4,12 @@ import { useForm } from "react-hook-form";
 import InputField from "@/components/forms/InputField";
 import { Button } from "@/components/ui/button";
 import FooterLink from "@/components/forms/FooterLink";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { signInWithEmail } from "@/lib/actions/auth.actions";
 
 export default function SignIn() {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -19,10 +23,13 @@ export default function SignIn() {
   });
 
   async function onSubmit(data: SignInFormData) {
-    try {
-      console.log(data);
-    } catch (e) {
-      console.error(e);
+    const result = await signInWithEmail(data);
+    if (result.success) {
+      router.push("/");
+    } else {
+      toast.error("Sign in failed", {
+        description: result.error ?? "Failed to sign in",
+      });
     }
   }
 
@@ -73,10 +80,10 @@ export default function SignIn() {
       </form>
 
       <FooterLink
-          text="Don't have an account?"
-          linkText="Sign up"
-          href="/sign-up"
-        />
+        text="Don't have an account?"
+        linkText="Sign up"
+        href="/sign-up"
+      />
     </>
   );
 }
