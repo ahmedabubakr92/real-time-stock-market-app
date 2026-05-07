@@ -6,11 +6,12 @@ import {
   validateArticle,
   calculateNewsDistribution,
 } from "@/lib/utils";
+import { POPULAR_STOCK_SYMBOLS } from "@/lib/constants";
 
 const FINNHUB_BASE_URL = "https://finnhub.io/api/v1";
 const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY;
 
-async function fetchJSON(url: string, revalidateSeconds?: number) {
+async function fetchJSON<T = unknown>(url: string, revalidateSeconds?: number): Promise<T> {
   const options: RequestInit = revalidateSeconds
     ? { cache: "force-cache", next: { revalidate: revalidateSeconds } }
     : { cache: "no-store" };
@@ -64,8 +65,11 @@ export async function getNews(
         cachedEntries.push(
           ...settled
             .filter(
-              (result): result is PromiseFulfilledResult<readonly [string, RawNewsArticle[]]> =>
-                result.status === "fulfilled",
+              (
+                result,
+              ): result is PromiseFulfilledResult<
+                readonly [string, RawNewsArticle[]]
+              > => result.status === "fulfilled",
             )
             .map((result) => result.value),
         );
@@ -92,7 +96,6 @@ export async function getNews(
 
       articles.sort((a, b) => b.datetime - a.datetime);
       return articles.length > 0 ? articles : await getNews();
-
     } else {
       // general news path
       const data: RawNewsArticle[] = await fetchJSON(
@@ -122,7 +125,9 @@ export async function getNews(
         if (url) seenUrls.add(url);
         if (headline) seenHeadlines.add(headline);
 
-        articles.push(formatArticle(article, false, undefined, articles.length));
+        articles.push(
+          formatArticle(article, false, undefined, articles.length),
+        );
 
         if (articles.length >= 6) break;
       }
@@ -131,5 +136,60 @@ export async function getNews(
   } catch (e) {
     console.error("Error fetching news:", e);
     throw new Error("Failed to fetch news");
+  }
+}
+
+export async function searchStocks(
+  query?: string,
+): Promise<StockWithWatchlistStatus[]> {
+  if (!FINNHUB_API_KEY) {
+    console.error("FINNHUB Api Key is not set");
+    return [];
+  }
+
+  try {
+    const trimmed = query?.trim() ?? "";
+
+    if (!trimmed) {
+      const top = POPULAR_STOCK_SYMBOLS.slice(0, 10);
+      const results = await Promise.allSettled(
+        top.map(async (symbol) => {
+          const data = await fetchJSON<any>(
+            `${FINNHUB_BASE_URL}/stock/profile2?symbol=${symbol}&token=${FINNHUB_API_KEY}`,
+            3600,
+          );
+          return { symbol, data };
+        }),
+      );
+
+      return results
+        .filter(
+          (r): r is PromiseFulfilledResult<any> => r.status === "fulfilled",
+        )
+        .map(({ value: { symbol, data } }) => ({
+          symbol: symbol.toUpperCase(),
+          name: data?.name || symbol,
+          exchange: data?.exchange || "US",
+          type: "Common Stock",
+          isInWatchlist: false,
+        }))
+        .filter((s) => s.name !== s.symbol);
+    }
+
+    const data = await fetchJSON<FinnhubSearchResponse>(
+      `${FINNHUB_BASE_URL}/search?q=${encodeURIComponent(trimmed)}&token=${FINNHUB_API_KEY}`,
+      1800,
+    );
+
+    return (data?.result ?? []).slice(0, 15).map((r) => ({
+      symbol: r.symbol.toUpperCase(),
+      name: r.description || r.symbol,
+      exchange: r.displaySymbol || "US",
+      type: r.type || "Stock",
+      isInWatchlist: false,
+    }));
+  } catch (e) {
+    console.error("Error searching stocks:", e);
+    return [];
   }
 }
