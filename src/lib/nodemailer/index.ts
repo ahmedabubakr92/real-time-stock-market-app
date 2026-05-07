@@ -1,5 +1,8 @@
 import nodemailer from "nodemailer";
-import { WELCOME_EMAIL_TEMPLATE } from "@/lib/nodemailer/templates";
+import {
+  NEWS_SUMMARY_EMAIL_TEMPLATE,
+  WELCOME_EMAIL_TEMPLATE,
+} from "@/lib/nodemailer/templates";
 
 const NODEMAILER_EMAIL = process.env.NODEMAILER_EMAIL;
 const NODEMAILER_PASSWORD = process.env.NODEMAILER_PASSWORD;
@@ -35,4 +38,31 @@ export async function sendWelcomeEmail({
   };
 
   await transporter.sendMail(mailOptions);
+}
+
+export async function sendNewsEmail({
+  email,
+  name,
+  newsContent,
+  date,
+}: {
+  email: string;
+  name: string;
+  newsContent: string;
+  date: string;
+}) {
+  const htmlTemplate = NEWS_SUMMARY_EMAIL_TEMPLATE.replaceAll(
+    "{{newsContent}}",
+    newsContent,
+  ).replaceAll("{{date}}", date);
+
+  const mailOptions = {
+    from: `"Signalist" <${NODEMAILER_EMAIL}>`,
+    to: email,
+    subject: `Your Daily Market Digest — ${date}`,
+    text: `Here's your daily market news summary, ${name}`,
+    html: htmlTemplate,
+  };
+
+  await transporter.sendMail(mailOptions)
 }
