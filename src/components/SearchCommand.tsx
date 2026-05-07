@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { searchStocks } from "@/lib/actions/finnhub.actions";
-import { useDebounce } from "@/hooks/useDebouce";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export default function SearchCommand({
   renderAs = "button",
