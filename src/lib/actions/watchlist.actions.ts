@@ -53,6 +53,6 @@ export async function getWatchlistSymbolsBulk(
     return result;
   } catch (e) {
     console.error("Error bulk fetching watchlist symbols", e);
-    return new Map();
+    throw e;
   }
 }

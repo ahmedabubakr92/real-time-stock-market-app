@@ -46,25 +46,32 @@ export async function getNews(
         cleanSymbols.length,
       );
 
-      // Fetch all symbols in parallel — allSettled keeps partial results so one
-      // failed symbol doesn't discard successful fetches for the others
-      const newsCache = new Map(
-        (
-          await Promise.allSettled(
-            cleanSymbols.map(async (symbol) => {
-              const data: RawNewsArticle[] = await fetchJSON(
-                `${FINNHUB_BASE_URL}/company-news?symbol=${symbol}&from=${from}&to=${to}&token=${FINNHUB_API_KEY}`,
-              );
-              return [symbol, data.filter(validateArticle)] as const;
-            }),
-          )
-        )
-          .filter(
-            (result): result is PromiseFulfilledResult<readonly [string, RawNewsArticle[]]> =>
-              result.status === "fulfilled",
-          )
-          .map((result) => result.value),
-      );
+      // Fetch symbols in batches of 5 to stay within Finnhub's 30 req/s rate limit.
+      // allSettled keeps partial results so one failed symbol doesn't discard the others.
+      const MAX_CONCURRENT = 5;
+      const cachedEntries: Array<readonly [string, RawNewsArticle[]]> = [];
+
+      for (let i = 0; i < cleanSymbols.length; i += MAX_CONCURRENT) {
+        const batch = cleanSymbols.slice(i, i + MAX_CONCURRENT);
+        const settled = await Promise.allSettled(
+          batch.map(async (symbol) => {
+            const data: RawNewsArticle[] = await fetchJSON(
+              `${FINNHUB_BASE_URL}/company-news?symbol=${symbol}&from=${from}&to=${to}&token=${FINNHUB_API_KEY}`,
+            );
+            return [symbol, data.filter(validateArticle)] as const;
+          }),
+        );
+        cachedEntries.push(
+          ...settled
+            .filter(
+              (result): result is PromiseFulfilledResult<readonly [string, RawNewsArticle[]]> =>
+                result.status === "fulfilled",
+            )
+            .map((result) => result.value),
+        );
+      }
+
+      const newsCache = new Map(cachedEntries);
 
       const articles: MarketNewsArticle[] = [];
 
