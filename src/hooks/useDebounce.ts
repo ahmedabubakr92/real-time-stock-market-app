@@ -8,6 +8,10 @@ export function useDebounce(fn: () => void, delay: number) {
         fnRef.current = fn
     }, [fn])
 
+    useEffect(() => {
+        return () => clearTimeout(timerRef.current)
+    }, [])
+
     return useCallback(() => {
         clearTimeout(timerRef.current)
         timerRef.current = setTimeout(() => fnRef.current(), delay)

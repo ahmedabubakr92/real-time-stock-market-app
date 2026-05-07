@@ -21,7 +21,7 @@ export default async function Layout({
         email: session.user.email
     }
 
-    const initialStocks = await searchStocks()
+    const initialStocks = await searchStocks().catch(() => [] as StockWithWatchlistStatus[])
     return (
         <main className="min-h-screen text-gray-400">
             <Header user={user} initialStocks={initialStocks}/>
