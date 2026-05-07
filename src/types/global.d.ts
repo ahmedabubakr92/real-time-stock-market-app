@@ -1,4 +1,9 @@
-import { Control, FieldError, RegisterOptions, UseFormRegister } from "react-hook-form";
+import {
+  Control,
+  FieldError,
+  RegisterOptions,
+  UseFormRegister,
+} from "react-hook-form";
 
 declare global {
   type SignInFormData = {
@@ -61,13 +66,50 @@ declare global {
     email: string;
     name: string;
     intro: string;
-  }
+  };
 
   type User = {
     id: string;
     name: string;
     email: string;
+  };
+
+  type MarketNewsArticle = {
+    id: number;
+    headline: string;
+    summary: string;
+    source: string;
+    url: string;
+    datetime: number;
+    category: string;
+    related: string;
+    image?: string;
+  };
+
+  type RawNewsArticle = {
+    id: number;
+    headline?: string;
+    summary?: string;
+    source?: string;
+    url?: string;
+    datetime?: number;
+    image?: string;
+    category?: string;
+    related?: string;
   }
+
+  type WatchlistItemData = {
+    id: string;
+    symbol: string;
+    company: string;
+    addedAt: Date;
+  };
+
+  type SymbolSearchResult = {
+    symbol: string;
+    description: string;
+    type: string;
+  };
 }
 
 export {};
