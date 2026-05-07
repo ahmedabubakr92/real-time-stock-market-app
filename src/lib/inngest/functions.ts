@@ -5,7 +5,7 @@ import {
 } from "@/lib/inngest/prompts";
 import { sendWelcomeEmail, sendNewsEmail } from "@/lib/nodemailer";
 import { getAllUsersForNewsEmail } from "@/lib/actions/user.actions";
-import { getWatchlistSymbolsByEmail } from "@/lib/actions/watchlist.actions";
+import { getWatchlistSymbolsBulk } from "@/lib/actions/watchlist.actions";
 import { getNews } from "@/lib/actions/finnhub.actions";
 import { buildSymbolGroups, getFormattedTodayDate } from "@/lib/utils";
 
@@ -67,23 +67,28 @@ export const sendDailyNewsSummary = inngest.createFunction(
     triggers: [
       { event: "app/send.daily.news" },
       { cron: "0 5 * * 1-5" },
-      { cron: "0 12 * * 1-5" },
-      { cron: "0 19 * * 1-5" },
+      { cron: "0 13 * * 1-5" }, // 17:00 UAE
+      { cron: "0 21 * * 0-4" }, // 01:00 UAE (next day = Sun-Thu nights)
     ],
   },
   async ({ step }) => {
-    // Step 1: Fetch all users and their watchlist symbols in one pass (parallel DB queries)
-    const usersWithSymbols = await step.run("get-users-with-symbols", async () => {
-      const users = await getAllUsersForNewsEmail();
-      if (!users || users.length === 0) return [];
+    // Step 1: Fetch all users then bulk-query their watchlist symbols in one DB round trip
+    const usersWithSymbols = await step.run(
+      "get-users-with-symbols",
+      async (): Promise<Array<{ user: User; symbols: string[] }>> => {
+        const users = await getAllUsersForNewsEmail();
+        if (!users || users.length === 0) return [];
 
-      return await Promise.all(
-        users.map(async (user) => {
-          const symbols = await getWatchlistSymbolsByEmail(user.email);
-          return { user, symbols };
-        }),
-      );
-    });
+        const symbolsByUserId = await getWatchlistSymbolsBulk(
+          users.map((u) => u.id),
+        );
+
+        return users.map((user) => ({
+          user,
+          symbols: symbolsByUserId.get(user.id) ?? [],
+        }));
+      },
+    );
 
     if (usersWithSymbols.length === 0) {
       return { success: false, message: "No users found for news email" };
@@ -98,7 +103,9 @@ export const sendDailyNewsSummary = inngest.createFunction(
       const stepKey = group.fingerprint || "general";
 
       const news = await step.run(`fetch-news-${stepKey}`, async () => {
-        return await getNews(group.symbols.length > 0 ? group.symbols : undefined);
+        return await getNews(
+          group.symbols.length > 0 ? group.symbols : undefined,
+        );
       });
 
       if (!news || news.length === 0) continue;
@@ -133,7 +140,12 @@ export const sendDailyNewsSummary = inngest.createFunction(
 
         await Promise.all(
           group.users.map((user) =>
-            sendNewsEmail({ email: user.email, name: user.name, newsContent, date }),
+            sendNewsEmail({
+              email: user.email,
+              name: user.name,
+              newsContent,
+              date,
+            }),
           ),
         );
       });

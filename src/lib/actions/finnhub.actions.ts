@@ -46,26 +46,48 @@ export async function getNews(
         cleanSymbols.length,
       );
 
+      // Fetch symbols in batches of 5 to stay within Finnhub's 30 req/s rate limit.
+      // allSettled keeps partial results so one failed symbol doesn't discard the others.
+      const MAX_CONCURRENT = 5;
+      const cachedEntries: Array<readonly [string, RawNewsArticle[]]> = [];
+
+      for (let i = 0; i < cleanSymbols.length; i += MAX_CONCURRENT) {
+        const batch = cleanSymbols.slice(i, i + MAX_CONCURRENT);
+        const settled = await Promise.allSettled(
+          batch.map(async (symbol) => {
+            const data: RawNewsArticle[] = await fetchJSON(
+              `${FINNHUB_BASE_URL}/company-news?symbol=${symbol}&from=${from}&to=${to}&token=${FINNHUB_API_KEY}`,
+            );
+            return [symbol, data.filter(validateArticle)] as const;
+          }),
+        );
+        cachedEntries.push(
+          ...settled
+            .filter(
+              (result): result is PromiseFulfilledResult<readonly [string, RawNewsArticle[]]> =>
+                result.status === "fulfilled",
+            )
+            .map((result) => result.value),
+        );
+      }
+
+      const newsCache = new Map(cachedEntries);
+
       const articles: MarketNewsArticle[] = [];
 
-      for (let round = 0; round < itemsPerSymbol; round ++) {
+      for (let round = 0; round < itemsPerSymbol; round++) {
         for (const symbol of cleanSymbols) {
-            if (articles.length >= targetNewsCount) break 
+          if (articles.length >= targetNewsCount) break;
 
-            const data: RawNewsArticle[] = await fetchJSON(
-                `${FINNHUB_BASE_URL}/company-news?symbol=${symbol}&from=${from}&to=${to}&token=${FINNHUB_API_KEY}`
-            )
+          const validArticles = newsCache.get(symbol) ?? [];
+          const article = validArticles[round];
 
-            const validArticles = data.filter(validateArticle)
-            const article = validArticles[round]
+          if (!article) continue;
 
-            if (!article) continue
-
-            articles.push(formatArticle(article, true, symbol, articles.length))
+          articles.push(formatArticle(article, true, symbol, articles.length));
         }
 
-        if (articles.length >= targetNewsCount) break
-
+        if (articles.length >= targetNewsCount) break;
       }
 
       articles.sort((a, b) => b.datetime - a.datetime);

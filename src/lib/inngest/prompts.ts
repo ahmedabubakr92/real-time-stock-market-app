@@ -75,7 +75,7 @@ NEWS ARTICLE STRUCTURE:
 For each individual news item within a section, use this structure:
 1. Article container with visual styling and icon 
 2. Article title as a subheading
-3. Key takeaways in bullet points (2 - 3 actionable insights)
+3. Key takeaways in bullet points (exactly 3 actionable insights)
 4. "What this means" section for context 
 5. "Read more" link to the original article 
 6. Visual divider between articles 
@@ -87,7 +87,7 @@ Wrap each article in a clean, simple container:
 ARTICLE TITLES:
 <h4 class="dark-text" style="margin: 0 0 16px 0; font-size: 18px; font-weight: 600; color: #FFFFFF; line-height: 1.4;">Article Title Here</h4>
 
-BULLET POINTS (minimum 3 concise insights):
+BULLET POINTS (exactly 3 concise insights):
 Use this format with clear, concise explanations (no label needed):
 <ul style="margin: 16px 0 20px 0; padding-left: 0; margin-left: 0; list-style: none;">
     <li class="dark-text-secondary" style="margin: 0 0 16px 0; padding: 0; margin-left: 0; font-size: 16px; line-height: 1.6; color: #CCDADC;">
@@ -124,7 +124,7 @@ Content guidelines:
 - Organize news into logical sections with icons (📊 Market Overview, 📈 Top Gainers, 📉 Top Losers, 🔥 Breaking News, 💼 Earnings Report, 🏦 Economic Data, etc.)
 - NEVER repeat section headings - use each section type only once per email 
 - For each news article, include its actual headline/title from the news data 
-- Provide MINIMUM 3 CONCISE bullet points (NO "Key Takeaways" label - start directly with bullets)
+- Provide EXACTLY 3 CONCISE bullet points (NO "Key Takeaways" label - start directly with bullets)
 - Each bullet should be SHORT and EASY TO UNDERSTAND - one clear sentence preferred 
 - Use PLAIN ENGLISH - avoid jargon, complex financial terms, or insider language 
 - Explain concepts as if talking to someone new to investing

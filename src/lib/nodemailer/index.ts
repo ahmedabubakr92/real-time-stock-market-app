@@ -40,6 +40,13 @@ export async function sendWelcomeEmail({
   await transporter.sendMail(mailOptions);
 }
 
+function stripDangerousContent(html: string): string {
+  return html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/javascript\s*:/gi, "")
+    .replace(/on\w+\s*=/gi, "");
+}
+
 export async function sendNewsEmail({
   email,
   name,
@@ -53,7 +60,7 @@ export async function sendNewsEmail({
 }) {
   const htmlTemplate = NEWS_SUMMARY_EMAIL_TEMPLATE.replaceAll(
     "{{newsContent}}",
-    newsContent,
+    stripDangerousContent(newsContent),
   ).replaceAll("{{date}}", date);
 
   const mailOptions = {
