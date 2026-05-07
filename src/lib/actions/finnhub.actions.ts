@@ -46,26 +46,33 @@ export async function getNews(
         cleanSymbols.length,
       );
 
+      // Fetch all symbols in parallel — each symbol is one API call regardless of itemsPerSymbol
+      const newsCache = new Map(
+        await Promise.all(
+          cleanSymbols.map(async (symbol) => {
+            const data: RawNewsArticle[] = await fetchJSON(
+              `${FINNHUB_BASE_URL}/company-news?symbol=${symbol}&from=${from}&to=${to}&token=${FINNHUB_API_KEY}`,
+            );
+            return [symbol, data.filter(validateArticle)] as const;
+          }),
+        ),
+      );
+
       const articles: MarketNewsArticle[] = [];
 
-      for (let round = 0; round < itemsPerSymbol; round ++) {
+      for (let round = 0; round < itemsPerSymbol; round++) {
         for (const symbol of cleanSymbols) {
-            if (articles.length >= targetNewsCount) break 
+          if (articles.length >= targetNewsCount) break;
 
-            const data: RawNewsArticle[] = await fetchJSON(
-                `${FINNHUB_BASE_URL}/company-news?symbol=${symbol}&from=${from}&to=${to}&token=${FINNHUB_API_KEY}`
-            )
+          const validArticles = newsCache.get(symbol) ?? [];
+          const article = validArticles[round];
 
-            const validArticles = data.filter(validateArticle)
-            const article = validArticles[round]
+          if (!article) continue;
 
-            if (!article) continue
-
-            articles.push(formatArticle(article, true, symbol, articles.length))
+          articles.push(formatArticle(article, true, symbol, articles.length));
         }
 
-        if (articles.length >= targetNewsCount) break
-
+        if (articles.length >= targetNewsCount) break;
       }
 
       articles.sort((a, b) => b.datetime - a.datetime);

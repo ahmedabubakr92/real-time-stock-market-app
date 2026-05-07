@@ -75,7 +75,7 @@ NEWS ARTICLE STRUCTURE:
 For each individual news item within a section, use this structure:
 1. Article container with visual styling and icon 
 2. Article title as a subheading
-3. Key takeaways in bullet points (2 - 3 actionable insights)
+3. Key takeaways in bullet points (exactly 3 actionable insights)
 4. "What this means" section for context 
 5. "Read more" link to the original article 
 6. Visual divider between articles 
