@@ -3,9 +3,15 @@ import Image from "next/image";
 import NavItems from "./NavItems";
 import UserDropdown from "./UserDropdown";
 
-function Header({user}: {user: User}) {
+function Header({
+  user,
+  initialStocks,
+}: {
+  user: User;
+  initialStocks: StockWithWatchlistStatus[];
+}) {
   return (
-    <header className="sticky top-0 header ">
+    <header className="sticky top-0 header">
       <div className="container header-wrapper">
         <Link href="/">
           <Image
@@ -17,9 +23,9 @@ function Header({user}: {user: User}) {
           />
         </Link>
         <nav className="hidden sm:block">
-          <NavItems />
+          <NavItems initialStocks={initialStocks} />
         </nav>
-        <UserDropdown user={user} />
+        <UserDropdown user={user} initialStocks={initialStocks} />
       </div>
     </header>
   );

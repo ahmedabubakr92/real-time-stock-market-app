@@ -96,7 +96,7 @@ declare global {
     image?: string;
     category?: string;
     related?: string;
-  }
+  };
 
   type WatchlistItemData = {
     id: string;
@@ -109,6 +109,35 @@ declare global {
     symbol: string;
     description: string;
     type: string;
+  };
+
+  type Stock = {
+    symbol: string;
+    name: string;
+    exchange: string;
+    type: string;
+  };
+
+  type StockWithWatchlistStatus = Stock & {
+    isInWatchlist: boolean;
+  };
+
+  type FinnhubSearchResult = {
+    symbol: string;
+    description: string;
+    displaySymbol?: string;
+    type: string;
+  };
+
+  type FinnhubSearchResponse = {
+    count: number;
+    result: FinnhubSearchResult[];
+  };
+
+  type SearchCommandProps = {
+    renderAs?: "button" | "text";
+    label?: string;
+    initialStocks: StockWithWatchlistStatus[];
   };
 }
 
