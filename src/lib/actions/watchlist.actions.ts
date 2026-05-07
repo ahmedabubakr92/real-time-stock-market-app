@@ -29,3 +29,30 @@ export async function getWatchlistSymbolsByEmail(
     return [];
   }
 }
+
+export async function getWatchlistSymbolsBulk(
+  userIds: string[],
+): Promise<Map<string, string[]>> {
+  if (userIds.length === 0) return new Map();
+
+  try {
+    await connectToDatabase();
+    const items = await Watchlist.find({ userId: { $in: userIds } })
+      .select("userId symbol")
+      .lean();
+
+    const result = new Map<string, string[]>();
+    for (const item of items) {
+      const existing = result.get(item.userId);
+      if (existing) {
+        existing.push(item.symbol);
+      } else {
+        result.set(item.userId, [item.symbol]);
+      }
+    }
+    return result;
+  } catch (e) {
+    console.error("Error bulk fetching watchlist symbols", e);
+    return new Map();
+  }
+}

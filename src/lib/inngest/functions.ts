@@ -5,7 +5,7 @@ import {
 } from "@/lib/inngest/prompts";
 import { sendWelcomeEmail, sendNewsEmail } from "@/lib/nodemailer";
 import { getAllUsersForNewsEmail } from "@/lib/actions/user.actions";
-import { getWatchlistSymbolsByEmail } from "@/lib/actions/watchlist.actions";
+import { getWatchlistSymbolsBulk } from "@/lib/actions/watchlist.actions";
 import { getNews } from "@/lib/actions/finnhub.actions";
 import { buildSymbolGroups, getFormattedTodayDate } from "@/lib/utils";
 
@@ -72,19 +72,21 @@ export const sendDailyNewsSummary = inngest.createFunction(
     ],
   },
   async ({ step }) => {
-    // Step 1: Fetch all users and their watchlist symbols in one pass (parallel DB queries)
+    // Step 1: Fetch all users then bulk-query their watchlist symbols in one DB round trip
     const usersWithSymbols = await step.run(
       "get-users-with-symbols",
-      async () => {
+      async (): Promise<Array<{ user: User; symbols: string[] }>> => {
         const users = await getAllUsersForNewsEmail();
         if (!users || users.length === 0) return [];
 
-        return await Promise.all(
-          users.map(async (user) => {
-            const symbols = await getWatchlistSymbolsByEmail(user.email);
-            return { user, symbols };
-          }),
+        const symbolsByUserId = await getWatchlistSymbolsBulk(
+          users.map((u) => u.id),
         );
+
+        return users.map((user) => ({
+          user,
+          symbols: symbolsByUserId.get(user.id) ?? [],
+        }));
       },
     );
 

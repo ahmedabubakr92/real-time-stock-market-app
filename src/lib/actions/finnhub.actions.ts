@@ -46,16 +46,24 @@ export async function getNews(
         cleanSymbols.length,
       );
 
-      // Fetch all symbols in parallel — each symbol is one API call regardless of itemsPerSymbol
+      // Fetch all symbols in parallel — allSettled keeps partial results so one
+      // failed symbol doesn't discard successful fetches for the others
       const newsCache = new Map(
-        await Promise.all(
-          cleanSymbols.map(async (symbol) => {
-            const data: RawNewsArticle[] = await fetchJSON(
-              `${FINNHUB_BASE_URL}/company-news?symbol=${symbol}&from=${from}&to=${to}&token=${FINNHUB_API_KEY}`,
-            );
-            return [symbol, data.filter(validateArticle)] as const;
-          }),
-        ),
+        (
+          await Promise.allSettled(
+            cleanSymbols.map(async (symbol) => {
+              const data: RawNewsArticle[] = await fetchJSON(
+                `${FINNHUB_BASE_URL}/company-news?symbol=${symbol}&from=${from}&to=${to}&token=${FINNHUB_API_KEY}`,
+              );
+              return [symbol, data.filter(validateArticle)] as const;
+            }),
+          )
+        )
+          .filter(
+            (result): result is PromiseFulfilledResult<readonly [string, RawNewsArticle[]]> =>
+              result.status === "fulfilled",
+          )
+          .map((result) => result.value),
       );
 
       const articles: MarketNewsArticle[] = [];
