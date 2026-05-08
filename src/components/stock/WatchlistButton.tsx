@@ -20,28 +20,37 @@ export default function WatchlistButton({
     e.stopPropagation();
     if (loading) return;
 
+    const nextIsInWatchlist = !isInWatchlist;
     setLoading(true);
-    setIsInWatchlist((prev) => !prev); // optimistic
+    setIsInWatchlist(nextIsInWatchlist); // optimistic
 
-    const result = isInWatchlist
-      ? await removeFromWatchlist(symbol)
-      : await addToWatchlist(symbol, company);
+    try {
+      const result = isInWatchlist
+        ? await removeFromWatchlist(symbol)
+        : await addToWatchlist(symbol, company);
 
-    if (!result.success) {
-      setIsInWatchlist((prev) => !prev); // revert on failure
-      toast.error(result.error ?? "Something went wrong");
-    } else {
-      onWatchlistChange?.(symbol, !isInWatchlist);
+      if (!result.success) {
+        setIsInWatchlist((prev) => !prev); // revert
+        toast.error(result.error ?? "Something went wrong");
+        return;
+      }
+
+      onWatchlistChange?.(symbol, nextIsInWatchlist);
       toast.success(
-        isInWatchlist ? `${symbol} removed from watchlist` : `${symbol} added to watchlist`,
+        nextIsInWatchlist ? `${symbol} added to watchlist` : `${symbol} removed from watchlist`,
       );
+    } catch {
+      setIsInWatchlist((prev) => !prev); // revert on thrown error
+      toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   if (type === "icon") {
     return (
       <button
+        type="button"
         onClick={handleClick}
         disabled={loading}
         aria-label={isInWatchlist ? `Remove ${symbol} from watchlist` : `Add ${symbol} to watchlist`}
@@ -69,6 +78,7 @@ export default function WatchlistButton({
 
   return (
     <button
+      type="button"
       onClick={handleClick}
       disabled={loading}
       className={`watchlist-btn w-full ${isInWatchlist ? "watchlist-remove" : ""}`}

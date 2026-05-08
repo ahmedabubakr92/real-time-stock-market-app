@@ -5,11 +5,11 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "*.finnhub.io",
+        hostname: "static2.finnhub.io",
       },
       {
         protocol: "https",
-        hostname: "*.imagekit.io",
+        hostname: "ik.imagekit.io",
       },
     ],
   },

@@ -29,7 +29,7 @@ export default async function Layout({
 
     const initialStocks = stocks.map((s) => ({
         ...s,
-        isInWatchlist: watchlistSymbols.includes(s.symbol),
+        isInWatchlist: watchlistSymbols.includes(s.symbol.toUpperCase()),
     }))
 
     return (

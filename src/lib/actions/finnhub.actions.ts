@@ -196,9 +196,10 @@ export async function searchStocks(
 
 export async function getStockProfile(symbol: string): Promise<StockProfile | null> {
   if (!FINNHUB_API_KEY) return null;
+  const encodedSymbol = encodeURIComponent(symbol.trim().toUpperCase());
   try {
     const data = await fetchJSON<Record<string, unknown>>(
-      `${FINNHUB_BASE_URL}/stock/profile2?symbol=${symbol}&token=${FINNHUB_API_KEY}`,
+      `${FINNHUB_BASE_URL}/stock/profile2?symbol=${encodedSymbol}&token=${FINNHUB_API_KEY}`,
       3600,
     );
     if (!data?.name) return null;
@@ -223,11 +224,12 @@ export async function getStockProfile(symbol: string): Promise<StockProfile | nu
 
 export async function getStockQuote(symbol: string): Promise<StockQuote | null> {
   if (!FINNHUB_API_KEY) return null;
+  const encodedSymbol = encodeURIComponent(symbol.trim().toUpperCase());
   try {
     const data = await fetchJSON<Record<string, number>>(
-      `${FINNHUB_BASE_URL}/quote?symbol=${symbol}&token=${FINNHUB_API_KEY}`,
+      `${FINNHUB_BASE_URL}/quote?symbol=${encodedSymbol}&token=${FINNHUB_API_KEY}`,
     );
-    if (!data?.c) return null;
+    if (typeof data?.c !== "number") return null;
     return {
       price: data.c,
       change: data.d ?? 0,
@@ -254,9 +256,10 @@ export async function getStockMetrics(symbol: string): Promise<StockMetrics> {
     capex: null, totalRevenue: null, volume: null,
   };
   if (!FINNHUB_API_KEY) return empty;
+  const encodedSymbol = encodeURIComponent(symbol.trim().toUpperCase());
   try {
     const data = await fetchJSON<{ metric: Record<string, unknown> }>(
-      `${FINNHUB_BASE_URL}/stock/metric?symbol=${symbol}&metric=all&token=${FINNHUB_API_KEY}`,
+      `${FINNHUB_BASE_URL}/stock/metric?symbol=${encodedSymbol}&metric=all&token=${FINNHUB_API_KEY}`,
       3600,
     );
     const m = data?.metric ?? {};

@@ -18,12 +18,17 @@ export default function WatchlistRow({ item }: WatchlistRowProps) {
 
   async function handleRemove() {
     setRemoving(true);
-    const result = await removeFromWatchlist(item.symbol);
-    if (result.success) {
-      toast.success(`${item.symbol} removed from watchlist`);
-      router.refresh();
-    } else {
-      toast.error(result.error ?? "Failed to remove");
+    try {
+      const result = await removeFromWatchlist(item.symbol);
+      if (result.success) {
+        toast.success(`${item.symbol} removed from watchlist`);
+        router.refresh();
+      } else {
+        toast.error(result.error ?? "Failed to remove");
+      }
+    } catch {
+      toast.error("Failed to remove");
+    } finally {
       setRemoving(false);
     }
   }
@@ -52,6 +57,7 @@ export default function WatchlistRow({ item }: WatchlistRowProps) {
           size="icon"
           onClick={handleRemove}
           disabled={removing}
+          aria-label={`Remove ${item.symbol} from watchlist`}
           className="watchlist-icon-btn"
         >
           <Trash2 className="trash-icon" />

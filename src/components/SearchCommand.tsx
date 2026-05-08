@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   CommandDialog,
   CommandEmpty,
@@ -23,6 +23,7 @@ export default function SearchCommand({
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [stocks, setStocks] = useState<StockWithWatchlistStatus[]>(initialStocks);
+  const latestSearchId = useRef(0);
 
   // Local watchlist set so star state stays correct across searches
   const [watchlistSymbols, setWatchlistSymbols] = useState<Set<string>>(
@@ -45,14 +46,15 @@ export default function SearchCommand({
 
   async function handleSearch() {
     if (!isSearchMode) return setStocks(initialStocks);
+    const searchId = ++latestSearchId.current;
     setLoading(true);
     try {
       const results = await searchStocks(searchTerm.trim());
-      setStocks(results);
+      if (searchId === latestSearchId.current) setStocks(results);
     } catch {
-      setStocks([]);
+      if (searchId === latestSearchId.current) setStocks([]);
     } finally {
-      setLoading(false);
+      if (searchId === latestSearchId.current) setLoading(false);
     }
   }
 
@@ -80,9 +82,9 @@ export default function SearchCommand({
   return (
     <>
       {renderAs === "text" ? (
-        <span onClick={() => setOpen(true)} className="search-text">
+        <button type="button" onClick={() => setOpen(true)} className="search-text">
           {label}
-        </span>
+        </button>
       ) : (
         <Button onClick={() => setOpen(true)} className="search-btn">
           {label}
@@ -109,10 +111,10 @@ export default function SearchCommand({
             </div>
           ) : (
             <ul>
-              <div className="search-count">
+              <li className="search-count" aria-hidden="true">
                 {isSearchMode ? "Search results" : "Popular stocks"}
                 {" "}({displayStocks?.length || 0})
-              </div>
+              </li>
               {displayStocks?.map((stock) => (
                 <li key={stock.symbol} className="search-item">
                   {/* Star is outside the Link so clicking it won't navigate */}
