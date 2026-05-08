@@ -78,6 +78,31 @@ export function buildSymbolGroups(
   return Array.from(groupMap.values());
 }
 
+// Converts a Finnhub million-denominated value to a human-readable string
+// e.g. 3_372_840 → "3.37T", 408_630 → "408.63B", 56_270 → "56.27B"
+export function formatMillions(value: number | null): string {
+  if (value === null || value === undefined) return "N/A";
+  const abs = Math.abs(value);
+  const sign = value < 0 ? "-" : "";
+  if (abs >= 1_000_000) return `${sign}${(abs / 1_000_000).toFixed(2)}T`;
+  if (abs >= 1_000) return `${sign}${(abs / 1_000).toFixed(2)}B`;
+  return `${sign}${abs.toFixed(2)}M`;
+}
+
+export function formatMetric(value: number | null, suffix = "", decimals = 2): string {
+  if (value === null || value === undefined) return "N/A";
+  return `${value.toFixed(decimals)}${suffix}`;
+}
+
+// Maps Finnhub exchange names to the TradingView prefix format
+export function getTradingViewSymbol(symbol: string, exchange: string): string {
+  const ex = exchange.toUpperCase();
+  if (ex.includes("NASDAQ")) return `NASDAQ:${symbol}`;
+  if (ex.includes("NEW YORK") || ex === "NYSE") return `NYSE:${symbol}`;
+  if (ex.includes("AMEX") || ex.includes("AMERICAN")) return `AMEX:${symbol}`;
+  return symbol;
+}
+
 export function getFormattedTodayDate() {
   return new Date().toLocaleDateString("en-US", {
     weekday: "long",

@@ -193,3 +193,103 @@ export async function searchStocks(
     return [];
   }
 }
+
+export async function getStockProfile(symbol: string): Promise<StockProfile | null> {
+  if (!FINNHUB_API_KEY) return null;
+  try {
+    const data = await fetchJSON<Record<string, unknown>>(
+      `${FINNHUB_BASE_URL}/stock/profile2?symbol=${symbol}&token=${FINNHUB_API_KEY}`,
+      3600,
+    );
+    if (!data?.name) return null;
+    return {
+      symbol: symbol.toUpperCase(),
+      name: String(data.name),
+      logo: String(data.logo ?? ""),
+      exchange: String(data.exchange ?? ""),
+      industry: String(data.finnhubIndustry ?? ""),
+      marketCap: Number(data.marketCapitalization ?? 0),
+      shares: Number(data.shareOutstanding ?? 0),
+      ipo: String(data.ipo ?? ""),
+      country: String(data.country ?? ""),
+      website: String(data.weburl ?? ""),
+      currency: String(data.currency ?? "USD"),
+    };
+  } catch (e) {
+    console.error("Error fetching stock profile:", e);
+    return null;
+  }
+}
+
+export async function getStockQuote(symbol: string): Promise<StockQuote | null> {
+  if (!FINNHUB_API_KEY) return null;
+  try {
+    const data = await fetchJSON<Record<string, number>>(
+      `${FINNHUB_BASE_URL}/quote?symbol=${symbol}&token=${FINNHUB_API_KEY}`,
+    );
+    if (!data?.c) return null;
+    return {
+      price: data.c,
+      change: data.d ?? 0,
+      percentChange: data.dp ?? 0,
+      high: data.h ?? 0,
+      low: data.l ?? 0,
+      open: data.o ?? 0,
+      prevClose: data.pc ?? 0,
+      timestamp: data.t ?? 0,
+    };
+  } catch (e) {
+    console.error("Error fetching stock quote:", e);
+    return null;
+  }
+}
+
+export async function getStockMetrics(symbol: string): Promise<StockMetrics> {
+  const empty: StockMetrics = {
+    eps: null, peRatio: null, dividendYield: null, nextEarningsDate: null,
+    enterpriseValue: null, evToEbitda: null, psRatio: null, pbRatio: null,
+    pcfRatio: null, pfcfRatio: null, grossMargin: null, operatingMargin: null,
+    pretaxMargin: null, netMargin: null, returnOnAssets: null, returnOnEquity: null,
+    operatingCashFlow: null, investingCashFlow: null, financingCashFlow: null,
+    capex: null, totalRevenue: null, volume: null,
+  };
+  if (!FINNHUB_API_KEY) return empty;
+  try {
+    const data = await fetchJSON<{ metric: Record<string, unknown> }>(
+      `${FINNHUB_BASE_URL}/stock/metric?symbol=${symbol}&metric=all&token=${FINNHUB_API_KEY}`,
+      3600,
+    );
+    const m = data?.metric ?? {};
+    const n = (key: string): number | null => {
+      const v = m[key];
+      return typeof v === "number" ? v : null;
+    };
+    return {
+      eps: n("epsBasicExclExtraTTM"),
+      peRatio: n("peBasicExclExtraTTM"),
+      dividendYield: n("dividendYieldIndicatedAnnual"),
+      nextEarningsDate: typeof m.nextEarningsDate === "string" ? m.nextEarningsDate : null,
+      enterpriseValue: n("enterpriseValue"),
+      evToEbitda: n("enterpriseValueOverEBITDA"),
+      psRatio: n("psTTM"),
+      pbRatio: n("pbRatioAnnual"),
+      pcfRatio: n("pcfShareAnnual"),
+      pfcfRatio: n("pfcfShareAnnual"),
+      grossMargin: n("grossMarginTTM"),
+      operatingMargin: n("operatingMarginAnnual"),
+      pretaxMargin: n("pretaxMarginTTM"),
+      netMargin: n("netMarginTTM"),
+      returnOnAssets: n("roaRfy"),
+      returnOnEquity: n("roeRfy"),
+      operatingCashFlow: n("operatingCashFlowAnnual"),
+      investingCashFlow: n("investingCashFlowAnnual"),
+      financingCashFlow: n("financingCashFlowAnnual"),
+      capex: n("capitalExpenditureAnnual"),
+      totalRevenue: n("revenueAnnual"),
+      volume: n("10DayAverageTradingVolume"),
+    };
+  } catch (e) {
+    console.error("Error fetching stock metrics:", e);
+    return empty;
+  }
+}
