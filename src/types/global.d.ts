@@ -139,6 +139,56 @@ declare global {
     label?: string;
     initialStocks: StockWithWatchlistStatus[];
   };
+
+  type StockProfile = {
+    symbol: string;
+    name: string;
+    logo: string;
+    exchange: string;
+    industry: string;
+    marketCap: number;
+    shares: number;
+    ipo: string;
+    country: string;
+    website: string;
+    currency: string;
+  };
+
+  type StockQuote = {
+    price: number;
+    change: number;
+    percentChange: number;
+    high: number;
+    low: number;
+    open: number;
+    prevClose: number;
+    timestamp: number;
+  };
+
+  type StockMetrics = {
+    eps: number | null;
+    peRatio: number | null;
+    dividendYield: number | null;
+    nextEarningsDate: string | null;
+    enterpriseValue: number | null;
+    evToEbitda: number | null;
+    psRatio: number | null;
+    pbRatio: number | null;
+    pcfRatio: number | null;
+    pfcfRatio: number | null;
+    grossMargin: number | null;
+    operatingMargin: number | null;
+    pretaxMargin: number | null;
+    netMargin: number | null;
+    returnOnAssets: number | null;
+    returnOnEquity: number | null;
+    operatingCashFlow: number | null;
+    investingCashFlow: number | null;
+    financingCashFlow: number | null;
+    capex: number | null;
+    totalRevenue: number | null;
+    volume: number | null;
+  };
 }
 
 export {};
