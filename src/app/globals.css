@@ -405,8 +405,7 @@
 
 .tradingview-widget-container__widget {
   background-color: #141414 !important;
-  height: 100% !important;
-
+  height: 100%;
 }
 
 .widget-stock-heatmap-container .screenerMapWrapper-BBVfGP0b {

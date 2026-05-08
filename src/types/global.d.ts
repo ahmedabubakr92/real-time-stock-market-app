@@ -140,6 +140,19 @@ declare global {
     initialStocks: StockWithWatchlistStatus[];
   };
 
+  type WatchlistButtonProps = {
+    symbol: string;
+    company: string;
+    isInWatchlist: boolean;
+    type?: "button" | "icon";
+    showTrashIcon?: boolean;
+    onWatchlistChange?: (symbol: string, isAdded: boolean) => void;
+  };
+
+  type StockDetailsPageProps = {
+    params: Promise<{ symbol: string }>;
+  };
+
   type StockProfile = {
     symbol: string;
     name: string;
