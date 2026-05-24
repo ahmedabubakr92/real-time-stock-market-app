@@ -24,11 +24,15 @@ export async function sendWelcomeEmail({
   name,
   intro,
 }: WelcomeEmailData) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? process.env.BETTER_AUTH_URL;
+  if (!baseUrl) {
+    throw new Error("Missing NEXT_PUBLIC_BASE_URL for welcome email links");
+  }
+  const normalizedBaseUrl = baseUrl.replace(/\/+$/, "");
   const htmlTemplate = WELCOME_EMAIL_TEMPLATE.replaceAll(
     "{{name}}",
     name,
-  ).replaceAll("{{intro}}", intro).replaceAll("{{baseUrl}}", baseUrl);
+  ).replaceAll("{{intro}}", intro).replaceAll("{{baseUrl}}", normalizedBaseUrl);
 
   const mailOptions = {
     from: `"Signalist" <${NODEMAILER_EMAIL}>`,
