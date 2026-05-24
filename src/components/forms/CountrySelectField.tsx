@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { Control, Controller, FieldError } from "react-hook-form";
+import { Control, Controller, FieldError, FieldValues, Path } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Check, ChevronsUpDown } from "lucide-react";
@@ -22,10 +22,10 @@ import {
   CommandList,
 } from "@/components/ui/command";
 
-type CountrySelectProps = {
-  name: string;
+type CountrySelectProps<T extends FieldValues> = {
+  name: Path<T>;
   label: string;
-  control: Control<any>;
+  control: Control<T>;
   error?: FieldError;
   required?: boolean;
 };
@@ -40,13 +40,13 @@ const getFlagEmoji = (countryCode: string) => {
 
 const countries = countryList().getData();
 
-export default function CountrySelectField({
+export default function CountrySelectField<T extends FieldValues>({
   name,
   label,
   control,
   error,
   required = false,
-}: CountrySelectProps) {
+}: CountrySelectProps<T>) {
   const [open, setOpen] = useState(false);
 
   return (

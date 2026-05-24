@@ -33,8 +33,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
       <section className="auth-right-section">
         <div className="z-10 relative lg:mt-4 lg:mb-16">
           <blockquote className="auth-blockquote">
-            Signalist turned my watchlist into a winning list. The alerts are
-            spot-on, and I feel more confident making moves in the market
+            Signalist completely changed how I track the market. The daily news digest saves me hours and the watchlist keeps everything in one place.
           </blockquote>
           <div className="flex items-center justify-between">
             <div>
