@@ -42,9 +42,9 @@ export async function signUpWithEmail({
       console.error("Failed to send Inngest event:", inngestError);
     }
 
-    return { success: true, data: response };
+    return { success: true };
   } catch (e) {
-    console.log("Sign up failed", e);
+    console.error("Sign up failed", e);
     return { success: false, error: "Sign up failed" };
   }
 }
@@ -60,16 +60,16 @@ export async function signOut() {
 
 export async function signInWithEmail({ email, password }: SignInFormData) {
   try {
-    const response = await auth.api.signInEmail({
+    await auth.api.signInEmail({
       body: {
         email,
         password,
       },
     });
 
-    return { success: true, data: response };
+    return { success: true };
   } catch (e) {
-    console.log("Sign in failed");
+    console.error("Sign in failed", e);
     return { success: false, error: "Sign in failed" };
   }
 }
