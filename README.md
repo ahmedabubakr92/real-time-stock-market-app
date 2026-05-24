@@ -2,7 +2,7 @@
 
 A real-time stock market tracking app with AI-powered daily news digests, personalized watchlists, and detailed company insights.
 
-**Live Demo:** [signalist.vercel.app](#) <!-- Replace with your Vercel URL after deploy -->
+**Live Demo:** [real-time-stock-market-app-two.vercel.app](https://real-time-stock-market-app-two.vercel.app)
 
 ![Dashboard Preview](public/assets/images/dashboard.png)
 
