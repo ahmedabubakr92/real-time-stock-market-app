@@ -36,7 +36,7 @@ export const sendSignUpEmail = inngest.createFunction(
       },
     });
 
-    const part = response.candidates[0].content.parts[0];
+    const part = response.candidates?.[0]?.content?.parts?.[0];
 
     await step.run("send-welcome-email", async () => {
       const introText =
@@ -132,7 +132,7 @@ export const sendDailyNewsSummary = inngest.createFunction(
 
       // Send to every user in this group — same summary, parallel sends
       await step.run(`send-emails-${stepKey}`, async () => {
-        const part = response.candidates[0].content.parts[0];
+        const part = response.candidates?.[0]?.content?.parts?.[0];
         const newsContent =
           (part && "text" in part ? part.text : null) ??
           "<p>No summary available today.</p>";

@@ -24,10 +24,11 @@ export async function sendWelcomeEmail({
   name,
   intro,
 }: WelcomeEmailData) {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "";
   const htmlTemplate = WELCOME_EMAIL_TEMPLATE.replaceAll(
     "{{name}}",
     name,
-  ).replaceAll("{{intro}}", intro);
+  ).replaceAll("{{intro}}", intro).replaceAll("{{baseUrl}}", baseUrl);
 
   const mailOptions = {
     from: `"Signalist" <${NODEMAILER_EMAIL}>`,

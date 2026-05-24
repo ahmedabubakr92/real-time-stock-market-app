@@ -51,7 +51,7 @@ export async function signUpWithEmail({
 
 export async function signOut() {
   try {
-    await auth?.api.signOut({ headers: await headers() });
+    await auth.api.signOut({ headers: await headers() });
   } catch (e) {
     console.log("Sign out failed", e);
     return { success: false, error: "Sign out failed" };
@@ -60,7 +60,7 @@ export async function signOut() {
 
 export async function signInWithEmail({ email, password }: SignInFormData) {
   try {
-    const response = await auth?.api.signInEmail({
+    const response = await auth.api.signInEmail({
       body: {
         email,
         password,

@@ -3,9 +3,10 @@ import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { connectToDatabase } from "@/database/mongoose";
 import { nextCookies } from "better-auth/next-js";
 
-let authInstance: ReturnType<typeof betterAuth> | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let authInstance: any = null;
 
-export async function getAuth() {
+export async function getAuth(): Promise<ReturnType<typeof betterAuth>> {
     if (authInstance) return authInstance;
 
     const mongoose = await connectToDatabase();

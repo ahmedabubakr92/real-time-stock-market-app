@@ -1,5 +1,4 @@
 import {
-  Control,
   FieldError,
   RegisterOptions,
   UseFormRegister,
@@ -26,9 +25,9 @@ declare global {
     label: string;
     placeholder: string;
     type?: string;
-    register: UseFormRegister;
+    register: UseFormRegister<any>;
     error?: FieldError;
-    validation?: RegisterOptions;
+    validation?: RegisterOptions<any>;
     disabled?: boolean;
     value?: string;
   };
@@ -38,23 +37,6 @@ declare global {
     label: string;
   };
 
-  type SelectFieldProps = {
-    name: string;
-    label: string;
-    placeholder: string;
-    options: readonly Option[];
-    control: Control;
-    error?: FieldError;
-    required?: boolean;
-  };
-
-  type SelectCountryProps = {
-    name: string;
-    label: string;
-    control: Control;
-    error?: FieldError;
-    required?: boolean;
-  };
 
   type FooterLinkProps = {
     text: string;
@@ -201,6 +183,10 @@ declare global {
     capex: number | null;
     totalRevenue: number | null;
     volume: number | null;
+  };
+
+  type WatchlistNewsProps = {
+    news?: MarketNewsArticle[];
   };
 }
 

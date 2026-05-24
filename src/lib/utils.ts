@@ -63,14 +63,14 @@ export function calculateNewsDistribution(symbolsCount: number) {
 export function buildSymbolGroups(
   usersWithSymbols: Array<{ user: User; symbols: string[] }>,
 ): Array<{ fingerprint: string; symbols: string[]; users: User[] }> {
-  const groupMap = new Map<string, { symbols: string[]; users: User[] }>();
+  const groupMap = new Map<string, { fingerprint: string; symbols: string[]; users: User[] }>();
 
   for (const { user, symbols } of usersWithSymbols) {
     const sorted = [...symbols].sort();
     const fingerprint = sorted.join("|"); // "" for users with no watchlist → general news
 
     if (!groupMap.has(fingerprint)) {
-      groupMap.set(fingerprint, { symbols: sorted, users: [] });
+      groupMap.set(fingerprint, { fingerprint, symbols: sorted, users: [] });
     }
     groupMap.get(fingerprint)!.users.push(user);
   }
